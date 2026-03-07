@@ -1,37 +1,124 @@
 // src/components/Pagination.jsx
-const Pagination = ({ currentPage, totalPages, onPrevPage, onNextPage }) => {
+const Pagination = ({ total, limit, skip, setSkip }) => {
+  const totalPages = Math.ceil(total / limit);
+  const currentPage = Math.floor(skip / limit) + 1;
+
   // Si no hay páginas, no mostramos el componente
-  if (totalPages === 0) return null;
+  if (totalPages <= 1) return null;
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setSkip(skip - limit);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setSkip(skip + limit);
+    }
+  };
+
+  const handlePageClick = (page) => {
+    setSkip((page - 1) * limit);
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Primera página y ellipsis si necesario
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => handlePageClick(1)}
+          className="px-3 py-2 rounded-lg font-semibold transition-all shadow-sm bg-white text-slate-700 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 hover:text-blue-600"
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        pages.push(
+          <span key="ellipsis1" className="px-2 py-2 text-slate-400">
+            ...
+          </span>
+        );
+      }
+    }
+
+    // Páginas visibles
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageClick(i)}
+          className={`px-3 py-2 rounded-lg font-semibold transition-all shadow-sm ${
+            i === currentPage
+              ? 'bg-blue-600 text-white border border-blue-600'
+              : 'bg-white text-slate-700 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    // Última página y ellipsis si necesario
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          <span key="ellipsis2" className="px-2 py-2 text-slate-400">
+            ...
+          </span>
+        );
+      }
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageClick(totalPages)}
+          className="px-3 py-2 rounded-lg font-semibold transition-all shadow-sm bg-white text-slate-700 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 hover:text-blue-600"
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pages;
+  };
 
   return (
-    <div className="flex justify-center items-center gap-4 mt-12 mb-8">
+    <div className="flex justify-center items-center gap-2 mt-12 mb-8 flex-wrap">
       {/* Botón Anterior */}
       <button
-        onClick={onPrevPage}
+        onClick={handlePrevPage}
         disabled={currentPage === 1}
-        className={`px-6 py-2 rounded-lg font-semibold transition-all shadow-sm
-          ${currentPage === 1 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+        className={`px-4 py-2 rounded-lg font-semibold transition-all shadow-sm ${
+          currentPage === 1
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
             : 'bg-white text-slate-700 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
-          }`}
+        }`}
       >
         Anterior
       </button>
 
-      {/* Indicador de Página Actual */}
-      <span className="text-slate-600 font-medium bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm">
-        Página <strong className="text-blue-600">{currentPage}</strong> de {totalPages}
-      </span>
+      {/* Números de página */}
+      {renderPageNumbers()}
 
       {/* Botón Siguiente */}
       <button
-        onClick={onNextPage}
+        onClick={handleNextPage}
         disabled={currentPage === totalPages}
-        className={`px-6 py-2 rounded-lg font-semibold transition-all shadow-sm
-          ${currentPage === totalPages 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+        className={`px-4 py-2 rounded-lg font-semibold transition-all shadow-sm ${
+          currentPage === totalPages
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
             : 'bg-white text-slate-700 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
-          }`}
+        }`}
       >
         Siguiente
       </button>
