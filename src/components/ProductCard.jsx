@@ -1,51 +1,49 @@
-// src/components/ProductCard.jsx
-import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { CartContext } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } = useCart();
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group border border-gray-100">
-      {/* Contenedor de la Imagen con efecto hover */}
-      <div className="relative h-56 overflow-hidden bg-gray-50 flex justify-center items-center p-4">
+    <div className="group relative bg-white rounded-[2.5rem] p-4 border border-gray-100 shadow-sm hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 transform hover:-translate-y-3">
+      <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-[#fdfdfd] mb-6">
+        <div className="absolute top-4 left-4 z-10 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter text-blue-600">
+          {product.category}
+        </div>
         <img 
           src={product.thumbnail} 
           alt={product.title} 
-          className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-700 ease-in-out"
         />
       </div>
 
-      {/* Contenido de la Tarjeta */}
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold text-slate-800 line-clamp-1" title={product.title}>
+      <div className="px-2">
+        <h3 className="text-xl font-bold text-gray-900 mb-2 truncate leading-tight">
           {product.title}
         </h3>
-        <p className="text-slate-500 text-sm mt-1 mb-4 line-clamp-2">
-          {product.description}
-        </p>
         
-        <div className="mt-auto">
-          <span className="text-2xl font-black text-blue-600">
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-3xl font-black text-gray-900 tracking-tighter">
             ${product.price}
           </span>
-          
-          {/* Botones */}
-          <div className="flex gap-2 mt-4">
-            <Link 
-              to={`/product/${product.id}`}
-              className="flex-1 text-center bg-slate-100 text-slate-700 py-2 rounded-lg font-semibold hover:bg-slate-200 transition-colors"
-            >
-              Ver detalle
-            </Link>
-            <button 
-              onClick={() => addToCart(product)}
-              className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 active:scale-95 transition-all shadow-md hover:shadow-lg"
-            >
-              Agregar
-            </button>
+          <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg">
+            <span className="text-amber-500 text-xs font-black">★ {product.rating}</span>
           </div>
+        </div>
+        
+        <div className="flex gap-2">
+          <Link 
+            to={`/product/${product.id}`}
+            className="flex-1 py-4 rounded-2xl bg-gray-50 text-gray-500 font-bold text-xs text-center hover:bg-gray-100 hover:text-gray-900 transition-all uppercase tracking-widest"
+          >
+            Detalle
+          </Link>
+          <button 
+            onClick={() => addToCart(product)}
+            className="flex-1 py-4 rounded-2xl bg-gray-900 text-white font-bold text-xs hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 uppercase tracking-widest"
+          >
+            Añadir
+          </button>
         </div>
       </div>
     </div>

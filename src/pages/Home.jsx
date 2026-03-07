@@ -1,99 +1,53 @@
-// src/pages/Home.jsx
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getProducts, searchProducts } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
 import Pagination from '../components/Pagination';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Estados para Búsqueda y Paginación
-  const [searchTerm, setSearchTerm] = useState('');
+  const [total, setTotal] = useState(0);
   const [skip, setSkip] = useState(0);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const limit = 8; // Requisito de la API
-
-  // Cálculos dinámicos
-  const currentPage = Math.floor(skip / limit) + 1;
-  const totalPages = Math.ceil(totalProducts / limit);
+  const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const limit = 8;
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      try {
-        // Si hay texto, usamos el endpoint de búsqueda, si no, el normal
-        const url = searchTerm 
-          ? `https://dummyjson.com/products/search?q=${searchTerm}&limit=${limit}&skip=${skip}`
-          : `https://dummyjson.com/products?limit=${limit}&skip=${skip}`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        setProducts(data.products);
-        setTotalProducts(data.total); // Guardamos el total para calcular las páginas
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
+      const data = query ? await searchProducts(query) : await getProducts(limit, skip);
+      setProducts(data.products || []);
+      setTotal(data.total || 0);
+      setLoading(false);
     };
-
-    // Pequeño retraso (debounce) para no saturar la API si el usuario escribe muy rápido
-    const delaySearch = setTimeout(() => {
-      fetchProducts();
-    }, 300);
-
-    return () => clearTimeout(delaySearch);
-  }, [searchTerm, skip]); // Se vuelve a ejecutar si cambia la búsqueda o la página
-
-  // Manejadores de eventos
-  const handleSearchChange = (value) => {
-    setSearchTerm(value);
-    setSkip(0); // REQUISITO: Resetear paginación al buscar
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setSkip(skip + limit);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setSkip(skip - limit);
-  };
+    fetchData();
+  }, [skip, query]);
 
   return (
-    <div className="animate-fade-in">
-      {/* Cabecera con Título y Buscador Separado */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-        <h1 className="text-3xl font-extrabold text-slate-800">
-          Catálogo
-        </h1>
-        <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+    <div className="min-h-screen pb-20 px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto pt-16">
+        <header className="text-center mb-16 animate-fade-in">
+          <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter mb-6">
+            MARCO<span className="text-blue-600 italic">.</span>SHOP
+          </h1>
+          <p className="text-xl text-gray-400 font-medium">Diseño, tecnología y vanguardia en un solo lugar.</p>
+        </header>
+
+        <SearchBar onSearch={(q) => { setQuery(q); setSkip(0); }} />
+
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+              {products.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+            {!query && <Pagination total={total} limit={limit} skip={skip} setSkip={setSkip} />}
+          </>
+        )}
       </div>
-
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
-        </div>
-      ) : products.length === 0 ? (
-        <div className="text-center text-gray-500 mt-12 text-xl">
-          No se encontraron productos para "{searchTerm}"
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
-
-      {/* Paginación Separada */}
-      <Pagination 
-        currentPage={currentPage} 
-        totalPages={totalPages} 
-        onPrevPage={handlePrevPage} 
-        onNextPage={handleNextPage} 
-      />
     </div>
   );
 };

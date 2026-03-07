@@ -1,42 +1,35 @@
-// src/context/CartContext.jsx
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 
-// 1. Crear el contexto
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // 2. Inicializar el estado leyendo de localStorage (Persistencia)
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    const saved = localStorage.getItem('marco_shop_cart');
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // 3. Guardar en localStorage cada vez que el carrito cambie
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('marco_shop_cart', JSON.stringify(cart));
   }, [cart]);
 
-  // Función para agregar al carrito
   const addToCart = (product) => {
-    setCart((prevCart) => {
-      // Evitamos duplicados exactos, si ya existe no lo agregamos de nuevo
-      const exists = prevCart.find(item => item.id === product.id);
-      if (exists) return prevCart;
-      return [...prevCart, product];
+    setCart(prev => {
+      const exists = prev.find(item => item.id === product.id);
+      if (exists) return prev.map(item => item.id === product.id ? {...item, quantity: item.quantity + 1} : item);
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  // Función para eliminar del carrito
-  const removeFromCart = (id) => {
-    setCart((prevCart) => prevCart.filter(item => item.id !== id));
-  };
-
-  // Cálculo del total dinámico
-  const total = cart.reduce((acc, item) => acc + item.price, 0);
+  const removeFromCart = (id) => setCart(prev => prev.filter(item => item.id !== id));
+  
+  const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, total }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, total, cartCount }}>
       {children}
     </CartContext.Provider>
   );
 };
+
+export const useCart = () => useContext(CartContext);
