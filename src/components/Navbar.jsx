@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
-const Navbar = () => {
-  const { cartCount, openCart } = useCart();
+const Navbar = ({ onCartClick }) => {
+  const { cartCount } = useCart();
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
@@ -25,7 +25,7 @@ const Navbar = () => {
           </Link>
           
           <button 
-            onClick={openCart}
+            onClick={onCartClick}
             className="relative flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-2xl hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-1"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

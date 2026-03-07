@@ -3,6 +3,7 @@ import { getProducts, searchProducts } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
 import Pagination from '../components/Pagination';
+import ProductDetail from './ProductDetail';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,7 @@ const Home = () => {
   const [skip, setSkip] = useState(0);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const limit = 8;
 
   useEffect(() => {
@@ -42,12 +44,29 @@ const Home = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-              {products.map((p) => <ProductCard key={p.id} product={p} />)}
+              {products.map((p) => <ProductCard key={p.id} product={p} onDetailClick={setSelectedProduct} />)}
             </div>
             {!query && <Pagination total={total} limit={limit} skip={skip} setSkip={setSkip} />}
           </>
         )}
       </div>
+
+      {/* Modal de detalle del producto */}
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-[3rem] max-w-6xl w-full max-h-[90vh] overflow-y-auto relative">
+            <button
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <ProductDetail product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

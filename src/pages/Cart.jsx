@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 
-const Cart = () => {
+const Cart = ({ onClose }) => {
   const { cart, removeFromCart, total } = useContext(CartContext);
 
   if (cart.length === 0) {
@@ -15,16 +15,23 @@ const Cart = () => {
         </div>
         <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tighter">Tu bolsa está vacía</h2>
         <p className="text-gray-500 mb-10 text-lg font-medium">Descubre productos increíbles en nuestro catálogo.</p>
-        <Link to="/" className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-lg shadow-gray-900/20">
+        <button onClick={onClose} className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-lg shadow-gray-900/20">
           Volver a la tienda
-        </Link>
+        </button>
       </div>
     );
   }
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
-      <h1 className="text-4xl font-black text-gray-900 mb-10 tracking-tighter">Tu Bolsa</h1>
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="text-4xl font-black text-gray-900 tracking-tighter">Tu Bolsa</h1>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       
       <div className="flex flex-col lg:flex-row gap-12">
         <div className="lg:w-2/3 space-y-6">

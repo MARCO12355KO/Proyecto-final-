@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onDetailClick }) => {
   const { addToCart } = useCart();
 
   return (
@@ -32,12 +32,12 @@ const ProductCard = ({ product }) => {
         </div>
         
         <div className="flex gap-2">
-          <Link 
-            to={`/product/${product.id}`}
+          <button 
+            onClick={() => onDetailClick(product)}
             className="flex-1 py-4 rounded-2xl bg-gray-50 text-gray-500 font-bold text-xs text-center hover:bg-gray-100 hover:text-gray-900 transition-all uppercase tracking-widest"
           >
             Detalle
-          </Link>
+          </button>
           <button 
             onClick={() => addToCart(product)}
             className="flex-1 py-4 rounded-2xl bg-gray-900 text-white font-bold text-xs hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 uppercase tracking-widest"

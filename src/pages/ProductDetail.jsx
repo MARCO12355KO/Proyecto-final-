@@ -2,27 +2,29 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 
-const ProductDetail = () => {
+const ProductDetail = ({ product: propProduct, onClose }) => {
   const { id } = useParams();
   const { addToCart } = useContext(CartContext);
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(propProduct || null);
+  const [loading, setLoading] = useState(!propProduct);
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`https://dummyjson.com/products/${id}`);
-        const data = await response.json();
-        setProduct(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProductDetails();
-  }, [id]);
+    if (!propProduct && id) {
+      const fetchProductDetails = async () => {
+        try {
+          setLoading(true);
+          const response = await fetch(`https://dummyjson.com/products/${id}`);
+          const data = await response.json();
+          setProduct(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProductDetails();
+    }
+  }, [id, propProduct]);
 
   if (loading) {
     return (
@@ -42,12 +44,21 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
-      <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-600 font-bold mb-8 transition-colors">
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Volver al catálogo
-      </Link>
+      {onClose ? (
+        <button onClick={onClose} className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-600 font-bold mb-8 transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Cerrar
+        </button>
+      ) : (
+        <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-600 font-bold mb-8 transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver al catálogo
+        </Link>
+      )}
 
       <div className="bg-white rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden flex flex-col md:flex-row">
         <div className="md:w-1/2 bg-gray-50/50 p-12 flex justify-center items-center">
