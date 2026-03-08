@@ -4,10 +4,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Modo oscuro */
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   background: #fafafa;
   color: #1a1a1a;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  background: #0f172a;
+  color: #f1f5f9;
 }
 
 @layer utilities {
@@ -21,6 +32,10 @@ body {
   
   .modal-enter {
     animation: modalEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
@@ -48,6 +63,21 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateX(150px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-10px) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
   }
 }
 
